@@ -48,8 +48,6 @@ Extra functions
 				fastq_to_fasta
 				multiline_fasta_to_singleline
 				clusters_to_single_reads
-
-
 '''
 
 import re 
@@ -58,6 +56,16 @@ import math
 class Clusters(object):
 
 	def __init__(self, fasta):
+		'''This initial function parses the fasta file and defines the
+		instances of the class. 
+
+		- self.dict_fasta: This dictionary has as key the name of the sequence
+		a as value a list with sequence, percentage and number of reads.
+		- self.names: list with all the names of the sequence clusters
+		- self.sequences: list with all the sequences
+		- self.percentages: list with all the percentages
+		- self.number_reads: list with all the numer of reads for each clusters
+		'''
         
         #Load the file and read lines
         self.fasta_file = open(fasta, "r").readlines()
@@ -85,7 +93,8 @@ class Clusters(object):
                 # Store the percentage in a list
                 self.percentages.append(percentage)
                     
-                # Define the name of the sequence without ">", number of reads and percentage
+                # Define the name of the sequence without ">", number of reads 
+                # and percentage
                 name = line[1:n_search.start()]
                 # Store the name in a list
                 self.names.append(name)
@@ -136,6 +145,7 @@ class Clusters(object):
             
         return(D)
 
+
     def simpsons_index_of_diversity(self):
         ''' Simpson's index of diversity measures the probability that two
         individuals (in this case reads) randomly selected from a sample will
@@ -175,7 +185,6 @@ class Clusters(object):
         return(1/D)
 
 
-    # This function writes to a fasta file the information of self.dict_fasta
     def clusters_object_to_fasta(self, fasta_name):
         ''' This function creates a fasta file from the dict_fasta object. Must
         provide a fasta_name as output file.
@@ -241,7 +250,7 @@ class Clusters(object):
         return (counter_haplotypes_over_min_number)
    
     
-    def filtering_clusters(self, value_type, cutoff):
+    def filtering_clusters_object(self, value_type, cutoff):
     	'''This function filter the clusters base the percentage or number of
     	reads cutoof and returns the dict_fasta updated.
     	'''
@@ -267,16 +276,13 @@ class Clusters(object):
 
 
 class Pileup(object):     
-    '''
-    This class is in charge of dealing with pileup files, parsing it and 
-    calculating diversity indices like nucleotide diversity and number of 
-    polymorphic sites. Must provide the name of mpileup file and minimun 
-    number of reads per position to be considered.
-
-    '''     
-
+    
     def __init__(self, pileup_file, min_reads_per_position=0):
-        
+    	'''	This initial function is in charge of dealing with pileup files, parsing it and 
+    	calculating diversity indices like nucleotide diversity and number of 
+   		polymorphic sites. Must provide the name of mpileup file and minimun 
+    	number of reads per position to be considered.
+		'''   
         # Create the dictionary to store each base data
         self.dict_pileup = {}
 
@@ -364,8 +370,11 @@ class Pileup(object):
 
 
 # These are python functions that may be used on the main workflow
+
 def filtering_clusters_by_percentage(input1, minimun_perc, output1):
-	'''
+	'''This function filters a clustered fasta file and writes it down to 
+	another fasta file. Must provide input fasta file name, minimun percentage
+	(from 0 to 1) as cutoff and output file name.
 	'''
     file_in = open (input1, "r")
     fasta_in = file_in.readlines()
@@ -414,7 +423,8 @@ def fastq_to_fasta(fastq_file, fasta_file):
     fastq = fastq1.readlines()
     fasta = open (fasta_file, "w")
     
-    # Create lists with the number of the lines carrying the name of reads and bases 
+    # Create lists with the number of the lines carrying the name of reads and
+    # bases 
     list_name_lines = [] # 0
     list_bases_lines = [] # 1
      
@@ -424,9 +434,9 @@ def fastq_to_fasta(fastq_file, fasta_file):
     for b in range(1,(len(fastq)+1),4):
         list_bases_lines.append(b)
     
-    # Iterate through each line in the file and copy only the ones that represent the
-    # name and the bases of each read to the new fasta file. Also replacing the "@" for 
-    # the ">" before each read name     
+    # Iterate through each line in the file and copy only the ones that 
+    # represent the name and the bases of each read to the new fasta file. 
+    # Also replacing the "@" for the ">" before each read name.     
     for number, line in enumerate(fastq):
         if number in list_name_lines:
             mod1 = re.sub('^@','>', line)
@@ -436,7 +446,6 @@ def fastq_to_fasta(fastq_file, fasta_file):
             fasta.write(line)
     
 
-# This function converts multiline fasta into single line
 def multiline_fasta_to_singleline(input1, output1):
 	'''Converts multiline fasta to single line fasta format.
 	Must provide name of original (multiline fasta) fasta and output fasta 
@@ -460,7 +469,7 @@ def multiline_fasta_to_singleline(input1, output1):
     y = re.sub("\|","",x)
     fasta_SL.write(y+"\n")
 
-# This function transform clusters back to single reads
+
 def clusters_to_single_reads(input1, output1):
 	'''Converts clusters back to single reads. 
 	Must provide name of clusters file and the single reads fasta file.
