@@ -116,10 +116,10 @@ class Clusters(object):
             entropy += subpop
 
         S = -(entropy/math.log(number_reads))
-        return(str(round(S,3)))
+        return(round(S,3))
 
    
-    def simpsons_index_A(self):
+    def simpsons_index(self):
         ''' Simpson's index measures the probability that two individuals (in this case reads) randomly selected from a sample will belong to the same species (in this case cluster).
         '''
         
@@ -130,19 +130,7 @@ class Clusters(object):
             
         return(round(D,2))
 
-    def simpsons_index_B(self):
-        ''' Simpson's index measures the probability that two individuals (in this case reads) randomly selected from a sample will belong to the same species (in this case cluster).
-        '''
-        
-        D = 0
-        for element in self.number_reads:
-            d= element*(element-1)
-            D += d
-        Df = D/ sum(self.number_reads)*(sum(self.number_reads)-1)
-            
-        return(Df)
-
-
+    
     def simpsons_index_of_diversity(self):
         ''' Simpson's index of diversity measures the probability that two individuals (in this case reads) randomly selected from a sample will belong to different species (in this case cluster). 
 
@@ -157,9 +145,6 @@ class Clusters(object):
         return(round(1-D, 2))
 
     
-
-
-
     def simpsons_reciprocal_index(self):
         '''Simpson's Reciprocal Index starts with 1 as the lowest value, representing a sample/community with just one sample. The greater the value, greater the diversity, meaning the total number of species. 
 
@@ -214,21 +199,21 @@ class Clusters(object):
         counter_haplotypes = 0
         counter_haplotypes_over_min_number = 0
 
-        # If percentage is used to filter the haplotypes
+        # If "percentage" is used to filter the haplotypes, choose a number from 0 to 100
         if value_type == "percentage":
             for key in self.dict_fasta.keys():
                 counter_haplotypes += 1
                 if self.dict_fasta [key][1] >= cutoff:
                     counter_haplotypes_over_min_number +=1
-                    #print(self.dict_fasta [key][1])
-
+                    
+        # If "number_reads" used to filter the haplotypes, choose a number an absolute minimun number
         elif value_type == "number_reads":
             for key in self.dict_fasta.keys():
                 counter_haplotypes += 1
                 if self.dict_fasta [key][2] >= cutoff:
                     counter_haplotypes_over_min_number +=1
-                    #print(self.dict_fasta [key][2])
-
+                   
+                   
         print ("From a total of " + str(counter_haplotypes) + " haplotypes only " + str(counter_haplotypes_over_min_number) + " are above the cutoff")
         return (counter_haplotypes_over_min_number)
    
@@ -281,6 +266,7 @@ class Pileup(object):
             nuc_diversity_list.append(Di)
 
         total_nuc_diversity = sum(nuc_diversity_list)/len(self.dict_pileup.values())
+        
         return(round(total_nuc_diversity,4))
 
 
@@ -311,20 +297,20 @@ class Pileup(object):
             
             # Loop through the self.dict_pileup items
             for key, value in self.dict_pileup.items():
-                    A = value.upper().count("A")
-                    T = value.upper().count("T")
-                    C = value.upper().count("C")
-                    G = value.upper().count("G")
+            	A = value.upper().count("A")
+                T = value.upper().count("T")
+                C = value.upper().count("C")
+                G = value.upper().count("G")
 
-                    list_n_bases = [A,T,C,G]
-                    list_n_bases.sort()
+                list_n_bases = [A,T,C,G]
+                list_n_bases.sort()
 
-                    if list_n_bases[2] > cutoff:
-                        number_polymorphic_sites += 1
-                        self.polymorphic_sites_dict[key] = value
+                if list_n_bases[2] > cutoff:
+                    number_polymorphic_sites += 1
+                    self.polymorphic_sites_dict[key] = value
 
 
-            return(number_polymorphic_sites)
+        return(number_polymorphic_sites)
 
 
 # These are python functions that may be used on the main workflow
